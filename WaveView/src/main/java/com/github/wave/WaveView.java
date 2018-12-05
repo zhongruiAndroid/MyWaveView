@@ -6,8 +6,6 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.Shader;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -43,6 +41,7 @@ public class WaveView extends View {
 
     private void init(AttributeSet attrs) {
         waveColor=Color.parseColor("#20D18C");
+        amplitude=dip2px(getContext(),30);
 
         if(attrs==null){
             return;
@@ -53,9 +52,12 @@ public class WaveView extends View {
     private Paint wavePaint;
 
     private int waveColor;
-    /*周期比例(宽度的百分之多少)*/
-    private float period;
-    private float periodScale=1f;
+    /*波长*/
+    private float waveLength;
+    /*波长比例(view width)*/
+    private float waveScale=0.7f;
+    /*振幅*/
+    private float amplitude;
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -83,7 +85,7 @@ public class WaveView extends View {
         wavePaint.setColor(waveColor);
         floats=new float[getWidth()];
         for (int i = 0; i < getWidth(); i++) {
-            float startY= (float) (90f*Math.sin((i*2f*Math.PI/period)));
+            float startY= (float) (amplitude*Math.sin((i*2f*Math.PI/ waveLength)));
             floats[i]=getHeight()-startY;
             canvas.drawLine(i,getHeight()-startY,i,getHeight(),wavePaint);
         }
@@ -101,7 +103,7 @@ public class WaveView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         initPaint();
 
-        period=getWidth()*periodScale;
+        waveLength =getWidth()*waveScale;
 
         updateWave();
     }
@@ -109,12 +111,18 @@ public class WaveView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-Log("==="+(wavePaint.getShader()==null));
-//        canvas.drawCircle(getWidth()/2,getHeight()/2,getHeight()/2,wavePaint);
-        canvas.drawRect(new Rect(0,0,getWidth(),getHeight()),wavePaint);
+        canvas.drawCircle(getWidth()/2,getHeight()/2,getHeight()/2,wavePaint);
 
-        /*for (int i = 0; i < getWidth(); i++) {
-            canvas.drawLine(i,floats[i]-100,i,getHeight(),wavePaint);
-        }*/
+    }
+
+
+    private float px2dip(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return   (pxValue / scale + 0.5f);
+    }
+
+    private float dip2px(Context context, float dipValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (dipValue * scale + 0.5f);
     }
 }
