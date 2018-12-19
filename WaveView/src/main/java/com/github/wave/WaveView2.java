@@ -16,25 +16,26 @@ import android.view.View;
  * @createBy r-zhong
  * @time 2018-12-05 14:57
  */
-public class WaveView extends View {
+public class WaveView2 extends View {
+
 
     private Bitmap bitmap;
 
     public void Log(String str){
         Log.i("===","==="+str);
     }
-    public WaveView(Context context) {
+    public WaveView2(Context context) {
         super(context);
         init(null);
 
     }
 
-    public WaveView(Context context, @Nullable AttributeSet attrs) {
+    public WaveView2(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(attrs);
     }
 
-    public WaveView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public WaveView2(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(attrs);
     }
@@ -53,10 +54,16 @@ public class WaveView extends View {
 
     private int waveColor;
     /*波长*/
-    private float waveLength=600;
-
+    private float waveLength;
+    /*波长比例(view width)*/
+    private float waveScale=0.7f;
     /*振幅*/
     private float amplitude;
+    /*进度*/
+    private float progress=30;
+    /*总进度*/
+    private float max=100;
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -68,7 +75,7 @@ public class WaveView extends View {
 
     private void initPaint() {
         wavePaint=new Paint(Paint.ANTI_ALIAS_FLAG);
-//        wavePaint.setStrokeWidth(2);
+//        wavePaint.setStrokeWidth(1);
 //        wavePaint.setColor(waveColor);
 
 //        this.wavePaint.setShader(null);
@@ -84,7 +91,7 @@ public class WaveView extends View {
         wavePaint.setColor(waveColor);
         floats=new float[getWidth()];
         for (int i = 0; i < getWidth(); i++) {
-            float startY= (float) (amplitude*Math.sin((i*2f*Math.PI/ waveLength)+0));
+            float startY= (float) (amplitude*Math.sin((i*2f*Math.PI/ waveLength)));
             floats[i]=getHeight()-startY;
             canvas.drawLine(i,getHeight()-startY,i,getHeight(),wavePaint);
         }
@@ -93,15 +100,12 @@ public class WaveView extends View {
         BitmapShader shader=new BitmapShader(bitmap,Shader.TileMode.REPEAT,Shader.TileMode.CLAMP);
         this.wavePaint.setShader(shader);
     }
-    public Bitmap getBitmap(){
-        return  bitmap;
-    }
-
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         initPaint();
 
+        waveLength =getWidth()*waveScale;
 
         updateWave();
     }
